@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Scraper IA – API de recherche de profils
 
 Application de démonstration qui prend une requête (ex : "elon musk tesla"), génère une liste de liens pertinents en rapport avec la personne (LinkedIn, Google, site officiel…), tente de scraper les pages accessibles et renvoie soit un résumé JSON structuré, soit un message propre en cas de blocage (anti‑bot).
@@ -62,3 +63,6 @@ Sur des sites fortement protégés (LinkedIn, Google, etc.), l’application :
 L’architecture est prête pour connecter des services de scraping professionnels (SERPAPI, Apify, etc.) afin d’obtenir les données de façon plus robuste.
 
 
+=======
+# scraper-IA
+>>>>>>> 8df2fa033648bd61706362f7b08b594636db657b
