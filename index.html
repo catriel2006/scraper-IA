@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scraper IA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">🔎 Scraper Intelligent - Résumé IA</h2>
+
+    <!-- FORMULAIRE avec ID scrapeForm -->
+    <form id="scrapeForm">
+        <div class="card p-4 shadow">
+            <div class="mb-3">
+                <label class="form-label">Prénom</label>
+                <input type="text" name="first_name" id="first_name" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Nom</label>
+                <input type="text" name="last_name" id="last_name" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Entreprise</label>
+                <input type="text" name="company" id="company" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">🔍 Rechercher</button>
+        </div>
+    </form>
+
+    <div class="card p-4 mt-4 shadow" id="result" style="display:none;">
+        <h4>Résultat :</h4>
+        <div id="output"></div>
+    </div>
+</div>
+
+<script>
+document.getElementById('scrapeForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData);
+
+    const resultDiv = document.getElementById('result');
+    resultDiv.style.display = 'block';
+    document.getElementById('output').innerHTML = '<div class="loading">⏳ Recherche en cours...</div>';
+
+    try {
+        const response = await fetch('http://127.0.0.1:8000/api/scrape-person', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.texts_found > 0) {
+            document.getElementById('output').innerHTML = `
+                <div class="success">
+                    <h3>✅ ${result.query}</h3>
+                    <strong>📊 Sources trouvées : ${result.texts_found}</strong>
+                    <pre class="json-pretty">${JSON.stringify(result.results, null, 2)}</pre>
+                </div>
+            `;
+        } else {
+            document.getElementById('output').innerHTML = `
+                <div class="warning">
+                    <h3>🔍 ${result.query}</h3>
+                    <p><strong>📈 Liens recherchés : ${result.links_tried?.length || 0}</strong></p>
+                    <ul class="links-list">${(result.links_tried || []).map(link => `<li><a href="${link}" target="_blank" class="link-primary">${link}</a></li>`).join('')}</ul>
+                    <p class="status">${result.results.message}</p>
+                </div>
+            `;
+        }
+    } catch (error) {
+        document.getElementById('output').innerHTML = `<div class="error">❌ Erreur: ${error.message}</div>`;
+    }
+});
+</script>
+
+<style>
+.loading { padding: 20px; text-align: center; color: #666; }
+.success { background: #d4edda; color: #155724; padding: 20px; border-radius: 8px; margin-top: 10px; }
+.warning { background: #fff3cd; color: #856404; padding: 20px; border-radius: 8px; margin-top: 10px; }
+.error { background: #f8d7da; color: #721c24; padding: 20px; border-radius: 8px; margin-top: 10px; }
+.json-pretty { background: #f8f9fa; padding: 15px; border-radius: 5px; font-size: 14px; max-height: 400px; overflow-y: auto; white-space: pre-wrap; }
+.status { font-style: italic; color: #856404; }
+.links-list { max-height: 200px; overflow-y: auto; list-style: none; padding: 0; }
+.links-list li { margin-bottom: 5px; }
+.links-list a { word-break: break-all; }
+h3 { margin-top: 0; }
+</style>
+</body>
+</html>
