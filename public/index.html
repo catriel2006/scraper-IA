@@ -47,11 +47,15 @@ document.getElementById('scrapeForm').addEventListener('submit', async (e) => {
     document.getElementById('output').innerHTML = '<div class="loading">⏳ Recherche en cours...</div>';
 
     try {
-        const response = await fetch('http://127.0.0.1:8000/api/scrape-person', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
+       const response = await fetch('/api/scrape', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    },
+    body: JSON.stringify(data)
+});
+
 
         const result = await response.json();
 
