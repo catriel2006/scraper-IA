@@ -56,27 +56,42 @@ document.getElementById('scrapeForm').addEventListener('submit', async (e) => {
     body: JSON.stringify(data)
 });
 
-
         const result = await response.json();
 
-        if (result.texts_found > 0) {
-            document.getElementById('output').innerHTML = `
-                <div class="success">
-                    <h3>✅ ${result.query}</h3>
-                    <strong>📊 Sources trouvées : ${result.texts_found}</strong>
-                    <pre class="json-pretty">${JSON.stringify(result.results, null, 2)}</pre>
-                </div>
-            `;
-        } else {
-            document.getElementById('output').innerHTML = `
-                <div class="warning">
-                    <h3>🔍 ${result.query}</h3>
-                    <p><strong>📈 Liens recherchés : ${result.links_tried?.length || 0}</strong></p>
-                    <ul class="links-list">${(result.links_tried || []).map(link => `<li><a href="${link}" target="_blank" class="link-primary">${link}</a></li>`).join('')}</ul>
-                    <p class="status">${result.results.message}</p>
-                </div>
-            `;
-        }
+// Sécurité minimale
+const results = result.results ?? {};
+const message =
+    results.message ??
+    result.message ??
+    "Aucune information disponible";
+
+if (result.texts_found > 0) {
+    document.getElementById('output').innerHTML = `
+        <div class="success">
+            <h3>✅ ${result.query}</h3>
+            <strong>📊 Sources trouvées : ${result.texts_found}</strong>
+            <pre class="json-pretty">${JSON.stringify(results, null, 2)}</pre>
+        </div>
+    `;
+} else {
+    document.getElementById('output').innerHTML = `
+        <div class="warning">
+            <h3>🔍 ${result.query ?? 'Recherche'}</h3>
+            <p><strong>📈 Liens recherchés : ${result.links_tried?.length ?? 0}</strong></p>
+            <ul class="links-list">
+                ${(result.links_tried ?? []).map(
+                    link => `<li><a href="${link}" target="_blank">${link}</a></li>`
+                ).join('')}
+            </ul>
+            <p class="status">${message}</p>
+        </div>
+    `;
+}
+
+
+
+
+       
     } catch (error) {
         document.getElementById('output').innerHTML = `<div class="error">❌ Erreur: ${error.message}</div>`;
     }
